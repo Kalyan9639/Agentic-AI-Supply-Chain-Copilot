@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic AI Supply Chain Copilot</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --border: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+
+        .risk-high {
+            border-left: 4px solid var(--danger);
+        }
+
+        .risk-medium {
+            border-left: 4px solid var(--warning);
+        }
+
+        .risk-low {
+            border-left: 4px solid var(--success);
+        }
+
+        .risk-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .risk-high .risk-badge { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .risk-medium .risk-badge { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .risk-low .risk-badge { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+
+        .news-title {
+            font-size: 1.125rem;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .news-content {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 16px;
+            white-space: pre-wrap;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--accent-hover); }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+        .btn-secondary:hover { background: #475569; }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover { background: #dc2626; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .reasoning {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .loader {
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .config-section {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .rule-tag {
+            display: inline-block;
+            background: var(--border);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin: 4px 4px 4px 0;
+        }
+
+        .helper-text {
+            margin-top: 8px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .save-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Agentic AI Supply Chain Copilot</h1>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                <span id="status-text">Agent Running</span>
+            </div>
+        </header>
+
+        <div class="grid">
+            <main>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-news">0</div>
+                        <div class="stat-label">News Analyzed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="high-risk">0</div>
+                        <div class="stat-label">High Risk Alerts</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Risk Assessments</div>
+                        <button class="btn-primary" onclick="runCycle()">Run Agent Cycle</button>
+                    </div>
+                    <div id="assessments-container">
+                        <div class="loader"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <div class="card config-section">
+                    <div class="card-header">
+                        <div class="card-title">Business Configuration</div>
+                    </div>
+                    <div id="config-container">
+                        <div class="form-group">
+                            <label>Business Name</label>
+                            <input type="text" id="business-name" value="Loading...">
+                        </div>
+                        <div class="form-group">
+                            <label>Commodity</label>
+                            <input type="text" id="commodity" value="Loading...">
+                        </div>
+                        <div class="form-group">
+                            <label>Region</label>
+                            <input type="text" id="region" value="Loading...">
+                        </div>
+                        <div class="form-group">
+                            <label>Business Rules</label>
+                            <textarea id="rules-textarea" rows="6" placeholder="Enter one rule per line"></textarea>
+                            <div class="helper-text">Type one rule per line. These rules are saved back to the backend config.</div>
+                        </div>
+                        <div class="save-row">
+                            <button class="btn-primary" onclick="saveConfig()">Save Business Profile</button>
+                            <button class="btn-secondary" onclick="reloadConfig()">Reload</button>
+                        </div>
+                        <div class="helper-text" id="save-status"></div>
+                    </div>
+                </div>
+            </main>
+
+            <aside>
+                <div class="card">
+                    <div class="card-title">Agent Status</div>
+                    <p style="color: var(--text-secondary); margin-top: 16px; font-size: 0.875rem;">
+                        The agentic AI copilot runs every 15 minutes to:
+                    </p>
+                    <ul style="color: var(--text-secondary); margin-top: 12px; padding-left: 20px; font-size: 0.875rem;">
+                        <li>Scrape ITLN logistics news</li>
+                        <li>Analyze risks using Gemma</li>
+                        <li>Store insights in local memory</li>
+                        <li>Propose actionable solutions</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentConfig = null;
+
+        async function fetchAssessments() {
+            try {
+                const response = await fetch(`${API_BASE}/assessments?limit=10`);
+                const data = await response.json();
+                renderAssessments(data);
+            } catch (error) {
+                console.error('Error fetching assessments:', error);
+            }
+        }
+
+        async function runCycle() {
+            const btn = document.querySelector('button[onclick="runCycle()"]');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Running...';
+
+            try {
+                const response = await fetch(`${API_BASE}/run-cycle`, { method: 'POST' });
+                const data = await response.json();
+                alert(`Cycle complete! ${data.assessments_count} assessments generated.`);
+                await fetchAssessments();
+            } catch (error) {
+                console.error('Error running cycle:', error);
+                alert('Error running cycle: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        }
+
+        function renderAssessments(assessments) {
+            const container = document.getElementById('assessments-container');
+
+            if (!assessments || assessments.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 40px;">No assessments yet. Run an agent cycle to analyze news.</div>';
+                return;
+            }
+
+            container.innerHTML = assessments.map(assessment => `
+                <div class="action-item risk-${assessment.risk_level.toLowerCase()}">
+                    <div class="news-title">Risk Assessment</div>
+                    <div class="news-content">${assessment.reasoning}</div>
+                    ${assessment.proposed_action ? `
+                        <div class="reasoning"><strong>Proposed Action:</strong> ${assessment.proposed_action}</div>
+                    ` : ''}
+                    <div class="news-meta">
+                        <span>Confidence: ${(assessment.confidence * 100).toFixed(0)}%</span>
+                        <span class="risk-badge risk-${assessment.risk_level.toLowerCase()}">${assessment.risk_level} Risk</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-primary">Approve</button>
+                        <button class="btn-secondary">Review</button>
+                        <button class="btn-danger">Reject</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Update stats
+            const highRiskCount = assessments.filter(a => a.risk_level === 'High').length;
+            document.getElementById('high-risk').innerText = highRiskCount;
+        }
+
+        async function fetchConfig() {
+            try {
+                const response = await fetch(`${API_BASE}/config`);
+                const config = await response.json();
+                currentConfig = config;
+                document.getElementById('business-name').value = config.business_name;
+                document.getElementById('commodity').value = config.commodity;
+                document.getElementById('region').value = config.region;
+                document.getElementById('rules-textarea').value = (config.rules || []).join('\n');
+                document.getElementById('save-status').innerText = '';
+            } catch (error) {
+                console.error('Error fetching config:', error);
+                document.getElementById('save-status').innerText = 'Unable to load business profile.';
+            }
+        }
+
+        async function saveConfig() {
+            const rules = document.getElementById('rules-textarea').value
+                .split('\n')
+                .map(rule => rule.trim())
+                .filter(Boolean);
+
+            const payload = {
+                business_name: document.getElementById('business-name').value.trim(),
+                commodity: document.getElementById('commodity').value.trim(),
+                region: document.getElementById('region').value.trim(),
+                rules,
+                created_at: currentConfig?.created_at || new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/config`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Save failed with status ${response.status}`);
+                }
+
+                currentConfig = await response.json();
+                document.getElementById('save-status').innerText = 'Business profile saved.';
+            } catch (error) {
+                console.error('Error saving config:', error);
+                document.getElementById('save-status').innerText = 'Failed to save business profile.';
+            }
+        }
+
+        async function reloadConfig() {
+            await fetchConfig();
+        }
+
+        // Initialize
+        fetchAssessments();
+        fetchConfig();
+    </script>
+</body>
+</html>
